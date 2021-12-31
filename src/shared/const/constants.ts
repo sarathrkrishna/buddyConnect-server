@@ -7,4 +7,7 @@ export default {
     DEFAULT_PORT: 5432,
     DEFAULT_HOST: 'localhost',
   },
+  AUTH: {
+    DEFAULT_JWT_EXPIRY: 3600,
+  },
 };

@@ -10,4 +10,9 @@ export default () => ({
     database: process.env.POSTGRES_DB,
     password: process.env.POSTGRES_PASSWORD,
   },
+  auth: {
+    hash_salt: process.env.HASH_SALT,
+    jwt_secret_key: process.env.JWT_SECRET_KEY,
+    jwt_expiry: process.env.JWT_EXPIRY || CONSTANTS.AUTH.DEFAULT_JWT_EXPIRY,
+  },
 });
