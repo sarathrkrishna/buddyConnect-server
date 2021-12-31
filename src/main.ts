@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('Main');
@@ -28,6 +29,16 @@ async function bootstrap() {
   const environment = configService.get('environment');
 
   app.enableShutdownHooks();
+
+  // swagger
+  const options = new DocumentBuilder()
+    .setTitle('BuddyConnect Server')
+    .setDescription("BuddyConnect's API server cluster")
+    .setVersion('1.0.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(port);
 
