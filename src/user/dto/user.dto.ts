@@ -1,5 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsBoolean,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,38 +8,46 @@ import {
 } from 'class-validator';
 
 export class InsertClientInputDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(20)
   username: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
   password: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
   fullName: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
-  description: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isDisabled: string;
+  description?: string;
 }
 
 export class InsertClientOutputDto {
+  @ApiProperty()
   id: number;
+  @ApiProperty()
   username: string;
+  @ApiProperty()
   fullName: string;
+  @ApiProperty()
   description: string;
+  @ApiProperty()
+  displayPictureUrl: string;
+  @ApiProperty()
   isDisabled: boolean;
-  createdAt: string;
+  @ApiProperty()
+  createAt: string;
 }
 
 export class UserOutputDto {
