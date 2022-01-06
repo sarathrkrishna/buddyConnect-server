@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { DatabaseModule } from './database/database.module';
+import { FileModule } from './file/file.module';
 import { UserModule } from './user/user.module';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -17,6 +18,7 @@ const NODE_ENV = process.env.NODE_ENV;
     DatabaseModule,
     UserModule,
     AuthModule,
+    FileModule,
   ],
   controllers: [],
   providers: [],

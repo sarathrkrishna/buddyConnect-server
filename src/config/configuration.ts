@@ -15,4 +15,7 @@ export default () => ({
     jwt_secret_key: process.env.JWT_SECRET_KEY,
     jwt_expiry: process.env.JWT_EXPIRY || CONSTANTS.AUTH.DEFAULT_JWT_EXPIRY,
   },
+  mediaStorage: {
+    mediaStorageBaseUrl: process.env.MEDIA_STORAGE_BASE_URL,
+  },
 });

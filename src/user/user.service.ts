@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { findOneUserByUsernameQuery } from './queries/user.queries';
-import { UserOutputDto } from './dto/user.dto';
+import {
+  findOneUserByUsernameQuery,
+  insertNewClientQuery,
+} from './queries/user.queries';
+import {
+  InsertClientInputDto,
+  InsertClientOutputDto,
+  UserOutputDto,
+} from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -18,5 +25,28 @@ export class UserService {
     );
 
     return user;
+  }
+
+  async userSignup(
+    userDetails: InsertClientInputDto,
+    filePath?: string,
+  ): Promise<InsertClientOutputDto> {
+    const { username, password, fullName, description } = userDetails;
+
+    const data = (
+      await this.databaseService.rawQuery<InsertClientOutputDto>(
+        insertNewClientQuery,
+        [username, password, fullName, description, filePath || ''],
+      )
+    )[0];
+
+    return {
+      ...data,
+      displayPictureUrl: data.displayPictureUrl
+        ? `${this.configService.get(
+            'mediaStorage.mediaStorageBaseUrl',
+          )}/file?imageURL=${data.displayPictureUrl}`
+        : undefined,
+    };
   }
 }

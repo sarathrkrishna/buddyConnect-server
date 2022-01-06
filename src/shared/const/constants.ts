@@ -10,4 +10,12 @@ export default {
   AUTH: {
     DEFAULT_JWT_EXPIRY: 3600,
   },
+  MULTER: {
+    SUPPORTED_IMAGE_TYPES: [
+      'image/jpeg',
+      'image/png',
+      'image/bmp',
+      'image/gif',
+    ],
+  },
 };
