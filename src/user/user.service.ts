@@ -3,8 +3,11 @@ import { DatabaseService } from '../database/database.service';
 import {
   findOneUserByUsernameQuery,
   insertNewClientQuery,
+  usernameAlreadyExistsQuery,
 } from './queries/user.queries';
 import {
+  CheckUsernameAlreadyExistsInputDto,
+  CheckUsernameAlreadyExistsOutputDto,
   InsertClientInputDto,
   InsertClientOutputDto,
   UserOutputDto,
@@ -50,5 +53,21 @@ export class UserService {
     }
 
     return data;
+  }
+
+  async checkUsernameAlreadyExists({
+    username,
+  }: CheckUsernameAlreadyExistsInputDto): Promise<CheckUsernameAlreadyExistsOutputDto> {
+    const [{ exists = undefined } = {}] = await this.databaseService.rawQuery<{
+      exists: string;
+    }>(usernameAlreadyExistsQuery, [username]);
+
+    if (exists) {
+      throw new NotAcceptableException('Username exists');
+    }
+
+    return {
+      status: 'good',
+    };
   }
 }

@@ -55,3 +55,15 @@ export class UserOutputDto {
   username: string;
   password: string;
 }
+
+export class CheckUsernameAlreadyExistsInputDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+}
+
+export class CheckUsernameAlreadyExistsOutputDto {
+  @ApiProperty()
+  status: string;
+}
