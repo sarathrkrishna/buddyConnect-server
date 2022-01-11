@@ -10,12 +10,11 @@ export const insertNewClientQuery = `
     	username,
     	password,
     	full_name,
-    	description,
-    	display_picture_url
+    	description
     )
-    SELECT $1, $2, $3, $4, $5 
+    SELECT $1, $2, $3, $4
     WHERE NOT EXISTS (
     	SELECT * FROM client_exists
     ) 
-    RETURNING id, username, full_name, description, display_picture_url, is_disabled, create_at;
+    RETURNING id, username, full_name, description, is_disabled, create_at;
 `;
