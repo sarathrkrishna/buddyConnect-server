@@ -1,8 +1,13 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
   findOneUserByUsernameQuery,
   insertNewClientQuery,
+  uploadFileQuery,
   usernameAlreadyExistsQuery,
 } from './queries/user.queries';
 import {
@@ -10,6 +15,9 @@ import {
   CheckUsernameAlreadyExistsOutputDto,
   InsertClientInputDto,
   InsertClientOutputDto,
+  UploadFileOutputDto,
+  UploadFileQueryDto,
+  UploadFileRequestDto,
   UserOutputDto,
 } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
@@ -68,6 +76,38 @@ export class UserService {
 
     return {
       status: 'good',
+    };
+  }
+
+  async dpUpload(
+    file: Express.Multer.File,
+    req: UploadFileRequestDto,
+  ): Promise<UploadFileOutputDto> {
+    if (!file) {
+      throw new NotAcceptableException('File Path is empty.');
+    }
+
+    const filePath = file.path;
+    const { id: userId } = req.user;
+
+    const fullFilePath = filePath
+      ? `${this.configService.get(
+          'mediaStorage.mediaStorageBaseUrl',
+        )}/file?imageURL=${filePath}`
+      : '';
+
+    const [{ done, displayPictureUrl }] =
+      await this.databaseService.rawQuery<UploadFileQueryDto>(uploadFileQuery, [
+        fullFilePath,
+        userId,
+      ]);
+
+    if (!done) {
+      throw new InternalServerErrorException('Could not update.');
+    }
+
+    return {
+      displayPictureUrl,
     };
   }
 }

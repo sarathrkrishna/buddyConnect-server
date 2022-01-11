@@ -22,3 +22,7 @@ export const insertNewClientQuery = `
 export const usernameAlreadyExistsQuery = `
     SELECT 1 as exists FROM client_master WHERE username=$1;
 `;
+
+export const uploadFileQuery = `
+    UPDATE client_master SET display_picture_url=$1 WHERE id=$2 RETURNING 1 as done, display_picture_url;
+`;
