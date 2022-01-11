@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
   findOneUserByUsernameQuery,
@@ -10,6 +10,7 @@ import {
   UserOutputDto,
 } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -29,24 +30,25 @@ export class UserService {
 
   async userSignup(
     userDetails: InsertClientInputDto,
-    filePath?: string,
   ): Promise<InsertClientOutputDto> {
     const { username, password, fullName, description } = userDetails;
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      +this.configService.get('auth.hash_salt'),
+    );
 
     const data = (
       await this.databaseService.rawQuery<InsertClientOutputDto>(
         insertNewClientQuery,
-        [username, password, fullName, description, filePath || ''],
+        [username, hashedPassword, fullName, description],
       )
     )[0];
 
-    return {
-      ...data,
-      displayPictureUrl: data.displayPictureUrl
-        ? `${this.configService.get(
-            'mediaStorage.mediaStorageBaseUrl',
-          )}/file?imageURL=${data.displayPictureUrl}`
-        : undefined,
-    };
+    if (!data) {
+      throw new NotAcceptableException('Username already exists.');
+    }
+
+    return data;
   }
 }
