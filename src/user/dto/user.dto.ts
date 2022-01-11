@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 
 export class InsertClientInputDto {
   @ApiProperty()
@@ -66,4 +67,15 @@ export class CheckUsernameAlreadyExistsInputDto {
 export class CheckUsernameAlreadyExistsOutputDto {
   @ApiProperty()
   status: string;
+}
+
+export class UploadFileRequestDto extends PartialType(GeneralRequestDto) {}
+
+export class UploadFileOutputDto {
+  displayPictureUrl: string;
+}
+
+export class UploadFileQueryDto {
+  done: string;
+  displayPictureUrl: string;
 }
