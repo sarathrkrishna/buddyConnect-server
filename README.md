@@ -2,14 +2,18 @@
 
 ## Enviroment variables
 
-| Variables             | Description        |
-| --------------------- | ------------------ |
-| `PORT`                | server port number |
-| `POSTGRES_LOCAL_PORT` | db port            |
-| `POSTGRES_HOST`       | db host            |
-| `POSTGRES_USER`       | db user            |
-| `POSTGRES_DB`         | db name            |
-| `POSTGRES_PASSWORD`   | db user password   |
+| Variables                | Description          |
+| ------------------------ | -------------------- |
+| `PORT`                   | server port number   |
+| `POSTGRES_LOCAL_PORT`    | db port              |
+| `POSTGRES_HOST`          | db host              |
+| `POSTGRES_USER`          | db user              |
+| `POSTGRES_DB`            | db name              |
+| `POSTGRES_PASSWORD`      | db user password     |
+| `HASH_SALT`              | hash salting number  |
+| `JWT_SECRET_KEY`         | JWT secret key       |
+| `JWT_EXPIRY`             | JWT expiration       |
+| `MEDIA_STORAGE_BASE_URL` | media storage domain |
 
 ## Description
 
