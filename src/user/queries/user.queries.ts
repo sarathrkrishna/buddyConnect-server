@@ -18,3 +18,7 @@ export const insertNewClientQuery = `
     ) 
     RETURNING id, username, full_name, description, is_disabled, create_at;
 `;
+
+export const usernameAlreadyExistsQuery = `
+    SELECT 1 as exists FROM client_master WHERE username=$1;
+`;
