@@ -1,20 +1,29 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
+  NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
   findOneUserByUsernameQuery,
+  getUserQuery,
   insertNewClientQuery,
+  searchUserQuery,
   uploadFileQuery,
   usernameAlreadyExistsQuery,
 } from './queries/user.queries';
 import {
   CheckUsernameAlreadyExistsInputDto,
   CheckUsernameAlreadyExistsOutputDto,
+  GetUserOutputDto,
+  GetUserQueryDto,
   InsertClientInputDto,
   InsertClientOutputDto,
+  SearchUsersQueryOutputDto,
+  UpdateUserInputDto,
+  UpdateUserOutputDto,
   UploadFileOutputDto,
   UploadFileQueryDto,
   UploadFileRequestDto,
@@ -22,7 +31,16 @@ import {
 } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-
+import {
+  GET_USER_SEARCH_BY_KEYS,
+  SEARCH_PAGINATION_CONSTS,
+} from 'src/shared/const/server-constants';
+import * as pgFormat from 'pg-format';
+import { SearchPaginationDto } from 'src/shared/dtos/general-dto';
+import {
+  isUUID,
+  prepareUpdateQueryKeyValuesString,
+} from 'src/shared/utils/utils';
 @Injectable()
 export class UserService {
   constructor(
@@ -109,5 +127,99 @@ export class UserService {
     return {
       displayPictureUrl,
     };
+  }
+
+  async getUser(query: GetUserQueryDto, uniqueKey: string) {
+    const { searchBy = 'id' } = query;
+
+    let sqlQuery: string;
+
+    switch (searchBy) {
+      case GET_USER_SEARCH_BY_KEYS.ID:
+        // check whether uniqueKey is uuid or not;
+        if (!isUUID(uniqueKey)) {
+          throw new BadRequestException('id is not a UUID.');
+        }
+        sqlQuery = pgFormat(
+          getUserQuery,
+          GET_USER_SEARCH_BY_KEYS.ID,
+          uniqueKey,
+        );
+        break;
+      case GET_USER_SEARCH_BY_KEYS.USERNAME:
+        sqlQuery = pgFormat(
+          getUserQuery,
+          GET_USER_SEARCH_BY_KEYS.USERNAME,
+          uniqueKey,
+        );
+        break;
+    }
+
+    const [userData] = await this.databaseService.rawQuery<GetUserOutputDto>(
+      sqlQuery,
+    );
+
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
+
+    return userData;
+  }
+
+  async searchUsers(query: SearchPaginationDto) {
+    const {
+      limit = SEARCH_PAGINATION_CONSTS.LIMIT,
+      offset = SEARCH_PAGINATION_CONSTS.OFFSET,
+      searchString = '',
+    } = query;
+
+    const searchKey = searchString ? `${searchString}%` : '';
+
+    const results =
+      await this.databaseService.rawQuery<SearchUsersQueryOutputDto>(
+        searchUserQuery,
+        [searchKey, limit, offset],
+      );
+
+    return {
+      searchString,
+      totalResults: results.length ? results[0].totalResults : 0,
+      results: results.map((result) => ({
+        ...result,
+        totalResults: undefined,
+      })),
+    };
+  }
+
+  async updateUser(id: string, body: UpdateUserInputDto) {
+    if (!isUUID(id)) {
+      throw new BadRequestException('id is not a UUID.');
+    }
+
+    if (body.password) {
+      const hashedPassword = await bcrypt.hash(
+        body.password,
+        +this.configService.get('auth.hash_salt'),
+      );
+      body.password = hashedPassword;
+    }
+
+    const { query: keyValuesString, valueArr: values } =
+      prepareUpdateQueryKeyValuesString(body);
+
+    const sqlQuery = pgFormat(
+      `UPDATE client_master SET ${keyValuesString} WHERE id = %L RETURNING id, username, full_name, description, display_picture_url, create_at;`,
+      ...values,
+      id,
+    );
+
+    const [updatedRow] =
+      await this.databaseService.rawQuery<UpdateUserOutputDto>(sqlQuery);
+
+    if (!updatedRow) {
+      throw new NotFoundException('User not found');
+    }
+
+    return updatedRow;
   }
 }

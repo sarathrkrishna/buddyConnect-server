@@ -8,15 +8,29 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Query,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
+import { SearchPaginationDto } from 'src/shared/dtos/general-dto';
 import {
   CheckUsernameAlreadyExistsInputDto,
   CheckUsernameAlreadyExistsOutputDto,
+  GetUserOutputDto,
+  GetUserQueryDto,
   InsertClientInputDto,
   InsertClientOutputDto,
+  SearchUsersOutputDto,
+  UpdateUserInputDto,
+  UpdateUserOutputDto,
   UploadFileOutputDto,
   UploadFileRequestDto,
 } from './dto/user.dto';
@@ -26,15 +40,6 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(public readonly userService: UserService) {}
 
-  @Post('signup')
-  @ApiBody({ type: InsertClientInputDto })
-  @ApiResponse({ type: InsertClientOutputDto })
-  async userSignup(
-    @Body() userDetails: InsertClientInputDto,
-  ): Promise<InsertClientOutputDto> {
-    return this.userService.userSignup(userDetails);
-  }
-
   @Get('username/:username')
   @ApiParam(CheckUsernameAlreadyExistsInputDto)
   @ApiResponse({ type: CheckUsernameAlreadyExistsOutputDto })
@@ -42,6 +47,15 @@ export class UserController {
     @Param() param: CheckUsernameAlreadyExistsInputDto,
   ): Promise<CheckUsernameAlreadyExistsOutputDto> {
     return this.userService.checkUsernameAlreadyExists(param);
+  }
+
+  @Patch('update-user/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'id' })
+  @ApiBody({ type: UpdateUserInputDto })
+  @ApiResponse({ type: UpdateUserOutputDto })
+  async updateUser(@Param('id') id: string, @Body() body: UpdateUserInputDto) {
+    return this.userService.updateUser(id, body);
   }
 
   @Post('dp-upload')
@@ -53,5 +67,34 @@ export class UserController {
     @Request() req: UploadFileRequestDto,
   ): Promise<UploadFileOutputDto> {
     return this.userService.dpUpload(file, req);
+  }
+
+  @Post('signup')
+  @ApiBody({ type: InsertClientInputDto })
+  @ApiResponse({ type: InsertClientOutputDto })
+  async userSignup(
+    @Body() userDetails: InsertClientInputDto,
+  ): Promise<InsertClientOutputDto> {
+    return this.userService.userSignup(userDetails);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: SearchPaginationDto })
+  @ApiResponse({ type: SearchUsersOutputDto })
+  async searchUsers(@Query() query: SearchPaginationDto) {
+    return this.userService.searchUsers(query);
+  }
+
+  @Get(':uniqueKey')
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'uniqueKey' })
+  @ApiQuery({ type: GetUserQueryDto })
+  @ApiResponse({ type: GetUserOutputDto })
+  async getUser(
+    @Query() query: GetUserQueryDto,
+    @Param('uniqueKey') uniqueKey: string,
+  ) {
+    return this.userService.getUser(query, uniqueKey);
   }
 }
