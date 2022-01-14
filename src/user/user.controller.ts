@@ -31,6 +31,7 @@ import {
   SearchUsersOutputDto,
   UpdateUserInputDto,
   UpdateUserOutputDto,
+  UpdateUserReqDto,
   UploadFileOutputDto,
   UploadFileRequestDto,
 } from './dto/user.dto';
@@ -49,13 +50,15 @@ export class UserController {
     return this.userService.checkUsernameAlreadyExists(param);
   }
 
-  @Patch('update-user/:id')
+  @Patch('update-user')
   @UseGuards(JwtAuthGuard)
-  @ApiParam({ name: 'id' })
   @ApiBody({ type: UpdateUserInputDto })
   @ApiResponse({ type: UpdateUserOutputDto })
-  async updateUser(@Param('id') id: string, @Body() body: UpdateUserInputDto) {
-    return this.userService.updateUser(id, body);
+  async updateUser(
+    @Body() body: UpdateUserInputDto,
+    @Request() req: UpdateUserReqDto,
+  ) {
+    return this.userService.updateUser(req, body);
   }
 
   @Post('dp-upload')

@@ -24,6 +24,7 @@ import {
   SearchUsersQueryOutputDto,
   UpdateUserInputDto,
   UpdateUserOutputDto,
+  UpdateUserReqDto,
   UploadFileOutputDto,
   UploadFileQueryDto,
   UploadFileRequestDto,
@@ -191,10 +192,8 @@ export class UserService {
     };
   }
 
-  async updateUser(id: string, body: UpdateUserInputDto) {
-    if (!isUUID(id)) {
-      throw new BadRequestException('id is not a UUID.');
-    }
+  async updateUser(req: UpdateUserReqDto, body: UpdateUserInputDto) {
+    const id = req.user.id;
 
     if (body.password) {
       const hashedPassword = await bcrypt.hash(
@@ -207,17 +206,33 @@ export class UserService {
     const { query: keyValuesString, valueArr: values } =
       prepareUpdateQueryKeyValuesString(body);
 
-    const sqlQuery = pgFormat(
-      `UPDATE client_master SET ${keyValuesString} WHERE id = %L RETURNING id, username, full_name, description, display_picture_url, create_at;`,
-      ...values,
-      id,
-    );
+    let sqlQuery: string;
+
+    if (body.username) {
+      sqlQuery = pgFormat(
+        `
+      WITH
+	      username_exists AS (
+	      	SELECT 1 AS exists FROM client_master WHERE username=%L
+	      )
+      UPDATE client_master SET ${keyValuesString} WHERE id = %L AND NOT EXISTS (SELECT FROM username_exists) RETURNING id, username, full_name, description, display_picture_url, create_at;`,
+        body.username,
+        ...values,
+        id,
+      );
+    } else {
+      sqlQuery = pgFormat(
+        `UPDATE client_master SET ${keyValuesString} WHERE id = %L RETURNING id, username, full_name, description, display_picture_url, create_at;`,
+        ...values,
+        id,
+      );
+    }
 
     const [updatedRow] =
       await this.databaseService.rawQuery<UpdateUserOutputDto>(sqlQuery);
 
     if (!updatedRow) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Cannot update');
     }
 
     return updatedRow;
