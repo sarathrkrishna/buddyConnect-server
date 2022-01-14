@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       // disableErrorMessages: true,
-      whitelist: true, // accept parameters that are specified in DTO
+      whitelist: true, // accept only the parameters that are specified in DTO
       transform: true, // transform params if possible
     }),
   );
