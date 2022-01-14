@@ -1,5 +1,4 @@
 import { UUID_REGEX } from '../const/server-constants';
-import * as bcrypt from 'bcrypt';
 
 export const snakeToCamelcase = (text: string): string => {
   return text

@@ -17,6 +17,7 @@ import {
 import {
   CheckUsernameAlreadyExistsInputDto,
   CheckUsernameAlreadyExistsOutputDto,
+  DeleteDisableUserInputDto,
   GetUserOutputDto,
   GetUserQueryDto,
   InsertClientInputDto,
@@ -32,6 +33,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import {
+  DFLAG_CONSTS,
   GET_USER_SEARCH_BY_KEYS,
   SEARCH_PAGINATION_CONSTS,
 } from 'src/shared/const/server-constants';
@@ -221,5 +223,16 @@ export class UserService {
     }
 
     return updatedRow;
+  }
+
+  async deleteOrDisableUser(query: DeleteDisableUserInputDto) {
+    const { dFlag } = query;
+
+    switch (dFlag) {
+      case DFLAG_CONSTS.DELETE:
+        break;
+      case DFLAG_CONSTS.DISABLE:
+        break;
+    }
   }
 }

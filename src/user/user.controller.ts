@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   Query,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -24,6 +25,7 @@ import { SearchPaginationDto } from 'src/shared/dtos/general-dto';
 import {
   CheckUsernameAlreadyExistsInputDto,
   CheckUsernameAlreadyExistsOutputDto,
+  DeleteDisableUserInputDto,
   GetUserOutputDto,
   GetUserQueryDto,
   InsertClientInputDto,
@@ -84,6 +86,11 @@ export class UserController {
   @ApiResponse({ type: SearchUsersOutputDto })
   async searchUsers(@Query() query: SearchPaginationDto) {
     return this.userService.searchUsers(query);
+  }
+
+  @Delete('delete')
+  async deleteOrDisableUser(@Query() query: DeleteDisableUserInputDto) {
+    return this.userService.deleteOrDisableUser(query);
   }
 
   @Get(':uniqueKey')

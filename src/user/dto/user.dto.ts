@@ -1,13 +1,17 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsIn,
+  IsISBN,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { GET_USER_SEARCH_BY_LIST } from 'src/shared/const/server-constants';
+import {
+  DFLAG_LIST,
+  GET_USER_SEARCH_BY_LIST,
+} from 'src/shared/const/server-constants';
 import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 
 export class InsertClientInputDto {
@@ -113,3 +117,11 @@ export class SearchUsersOutputDto {
 export class UpdateUserInputDto extends PartialType(InsertClientInputDto) {}
 
 export class UpdateUserOutputDto extends PartialType(MasterClientDataDto) {}
+
+export class DeleteDisableUserInputDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(DFLAG_LIST)
+  dFlag: string;
+}

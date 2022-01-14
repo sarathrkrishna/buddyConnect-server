@@ -17,3 +17,10 @@ export const SEARCH_PAGINATION_CONSTS = {
   LIMIT: 5,
   OFFSET: 0,
 };
+
+export const DFLAG_CONSTS = {
+  DELETE: 'delete',
+  DISABLE: 'disable',
+};
+
+export const DFLAG_LIST = [DFLAG_CONSTS.DELETE, DFLAG_CONSTS.DISABLE];
