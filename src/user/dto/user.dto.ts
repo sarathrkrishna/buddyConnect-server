@@ -110,6 +110,8 @@ export class SearchUsersOutputDto {
   results: MasterClientDataDto[];
 }
 
+export class UpdateUserReqDto extends PartialType(GeneralRequestDto) {}
+
 export class UpdateUserInputDto extends PartialType(InsertClientInputDto) {}
 
 export class UpdateUserOutputDto extends PartialType(MasterClientDataDto) {}
