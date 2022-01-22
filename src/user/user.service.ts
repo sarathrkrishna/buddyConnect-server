@@ -167,7 +167,7 @@ export class UserService {
     return userData;
   }
 
-  async searchUsers(query: SearchPaginationDto) {
+  async searchUsers(query: SearchPaginationDto, userId: string) {
     const {
       limit = SEARCH_PAGINATION_CONSTS.LIMIT,
       offset = SEARCH_PAGINATION_CONSTS.OFFSET,
@@ -179,12 +179,12 @@ export class UserService {
     const results =
       await this.databaseService.rawQuery<SearchUsersQueryOutputDto>(
         searchUserQuery,
-        [searchKey, limit, offset],
+        [searchKey, userId, limit, offset],
       );
 
     return {
       searchString,
-      totalResults: results.length ? results[0].totalResults : 0,
+      totalResults: results.length ? +results[0].totalResults : 0,
       results: results.map((result) => ({
         ...result,
         totalResults: undefined,
