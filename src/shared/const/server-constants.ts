@@ -17,3 +17,8 @@ export const SEARCH_PAGINATION_CONSTS = {
   LIMIT: 5,
   OFFSET: 0,
 };
+
+export const PAGINATION_DEFAULTS = {
+  DEF_LIMIT: 5,
+  DEF_OFFSET: 0,
+};
