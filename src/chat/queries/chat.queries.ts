@@ -56,3 +56,21 @@ export const searchChatQuery = `
 	)
 SELECT *, (SELECT * FROM total_results_count) FROM chat_infos ORDER BY last_updated DESC LIMIT $3 OFFSET $4 
 `;
+
+export const getAllChatsQuery = `
+	WITH 
+	client_non_group_chats AS (
+		SELECT cm.chat_id FROM chat_master cm INNER JOIN chat_data cd ON cm.chat_id = cd.id
+		WHERE cm.client_id = $1 AND NOT cd.is_group
+	),
+	chat_and_member_info AS (
+		SELECT cm.client_id, cm.chat_id, username, full_name, display_picture_url, cd.last_updated FROM chat_master cm 
+		INNER JOIN client_master clm ON cm.client_id = clm.id
+		INNER JOIN chat_data cd ON cm.chat_id = cd.id
+		WHERE cm.chat_id IN (SELECT chat_id FROM client_non_group_chats) AND cm.client_id <> $1
+	),
+	total_results_count AS (
+		SELECT COUNT (*) as total_results_count FROM chat_and_member_info
+	)
+	SELECT *, (SELECT total_results_count FROM total_results_count) FROM chat_and_member_info ORDER BY last_updated DESC LIMIT $2 OFFSET $3;
+`;

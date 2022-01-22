@@ -15,6 +15,8 @@ import { ChatService } from './chat.service';
 import {
   ChatCreateInputDto,
   ChatCreateOutputDto,
+  GetAllChatsInputDto,
+  GetAllChatsOutputDto,
   SearchChatsInputDto,
   SearchChatsOutputDto,
 } from './dto/chat.dto';
@@ -37,8 +39,10 @@ export class ChatController {
 
   @Get('all')
   @UseGuards(JwtAuthGuard)
+  @ApiQuery({ type: GetAllChatsInputDto })
+  @ApiResponse({ type: GetAllChatsOutputDto })
   async getAllChats(
-    @Query() query: SearchChatsInputDto,
+    @Query() query: GetAllChatsInputDto,
     @Request() req: GeneralRequestDto,
   ) {
     return this.chatService.getAllChats(query, req.user.id);
