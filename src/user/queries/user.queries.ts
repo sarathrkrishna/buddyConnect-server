@@ -34,17 +34,17 @@ export const getUserQuery = `
 
 export const searchUserQuery = `
     WITH
-        non_disabled_users AS (
-            SELECT * FROM client_master WHERE NOT is_disabled
-        ),
-        search_users AS (
-            SELECT id, username, full_name, description, display_picture_url, create_at FROM non_disabled_users
-            WHERE username ILIKE $1 OR full_name ILIKE $1
-        ),
-        results_count AS (
-            SELECT COUNT (*) AS total_results FROM search_users
-        )
-    SELECT *, (SELECT * FROM results_count) FROM search_users LIMIT $2 OFFSET $3;
+	non_disabled_users AS (
+		SELECT * FROM client_master WHERE NOT is_disabled
+	),
+	search_users AS (
+		SELECT id, username, full_name, description, display_picture_url, create_at FROM non_disabled_users
+		WHERE (username ILIKE $1 OR full_name ILIKE $1) AND id <> $2
+	),
+	results_count AS (
+		SELECT COUNT (*) AS total_results FROM search_users
+	)
+    SELECT *, (SELECT * FROM results_count) FROM search_users LIMIT $3 OFFSET $4;
 `;
 
 export const userUpdateQuery = `

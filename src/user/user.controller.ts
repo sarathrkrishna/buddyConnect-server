@@ -85,8 +85,11 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: SearchPaginationDto })
   @ApiResponse({ type: SearchUsersOutputDto })
-  async searchUsers(@Query() query: SearchPaginationDto) {
-    return this.userService.searchUsers(query);
+  async searchUsers(
+    @Query() query: SearchPaginationDto,
+    @Request() req: UpdateUserReqDto,
+  ) {
+    return this.userService.searchUsers(query, req.user.id);
   }
 
   @Get(':uniqueKey')
