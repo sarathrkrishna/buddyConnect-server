@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { SearchPaginationDto } from '../../shared/dtos/general-dto';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -47,4 +47,14 @@ export class SearchChatsApiResultsDto {
 
   @ApiProperty({ type: Array(SearchChatsOutputDto) })
   results: SearchChatsOutputDto[];
+}
+
+export class GetAllChatsInputDto extends PartialType(SearchPaginationDto) {}
+export class GetAllChatsQueryOutDto extends SearchChatsOutputDto {}
+
+export class GetAllChatsOutputDto {
+  @ApiProperty()
+  totalResults: number;
+  @ApiProperty({ type: Array(GetAllChatsOutputDto) })
+  results: GetAllChatsQueryOutDto[];
 }

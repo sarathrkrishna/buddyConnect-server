@@ -4,10 +4,16 @@ import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 import {
   ChatCreateInputDto,
   ChatCreateOutputDto,
+  GetAllChatsInputDto,
+  GetAllChatsQueryOutDto,
   SearchChatsInputDto,
   SearchChatsOutputDto,
 } from './dto/chat.dto';
-import { createChatQuery, searchChatQuery } from './queries/chat.queries';
+import {
+  createChatQuery,
+  getAllChatsQuery,
+  searchChatQuery,
+} from './queries/chat.queries';
 
 @Injectable()
 export class ChatService {
@@ -41,6 +47,23 @@ export class ChatService {
     return {
       searchString,
       totalResults: results.length ? +results[0].totalResultsCount : 0,
+      results: results.map((result) => ({
+        ...result,
+        totalResultsCount: undefined,
+      })),
+    };
+  }
+
+  async getAllChats(query: GetAllChatsInputDto, userId: string) {
+    const { limit, offset } = query;
+
+    const results = await this.databaseService.rawQuery<GetAllChatsQueryOutDto>(
+      getAllChatsQuery,
+      [userId, limit, offset],
+    );
+
+    return {
+      totalResults: results.length ? results[0].totalResultsCount : 0,
       results: results.map((result) => ({
         ...result,
         totalResultsCount: undefined,
