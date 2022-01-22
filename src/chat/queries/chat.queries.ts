@@ -12,8 +12,8 @@ export const createChatQuery = `
 	),
 	create_chat AS (
 		INSERT INTO chat_data (
-			creator_id
-		) SELECT $1 WHERE NOT EXISTS (SELECT * FROM chat_exists) RETURNING creator_id AS client_id, id AS chat_id
+			creator_id, last_updated
+		) SELECT $1 AS creator_id, NOW() AS last_updated WHERE NOT EXISTS (SELECT * FROM chat_exists) RETURNING creator_id AS client_id, id AS chat_id
 	),
 	chat_clients AS (
 		SELECT * FROM create_chat
@@ -48,11 +48,11 @@ export const searchChatQuery = `
 		WHERE cm.client_id = $2
  	),
 	chat_infos AS (
-		SELECT client_id, chat_id, username, full_name, display_picture_url FROM this_client_included_chats tcic 
+		SELECT client_id, chat_id, username, full_name, display_picture_url, last_updated FROM this_client_included_chats tcic 
 		INNER JOIN chat_data cd ON tcic.chat_id=cd.id WHERE NOT is_group
 	),
 	total_results_count AS (
 		SELECT COUNT(*) AS total_results_count FROM chat_infos
 	)
-SELECT *, (SELECT * FROM total_results_count) FROM chat_infos LIMIT $3 OFFSET $4
+SELECT *, (SELECT * FROM total_results_count) FROM chat_infos ORDER BY last_updated DESC LIMIT $3 OFFSET $4 
 `;
