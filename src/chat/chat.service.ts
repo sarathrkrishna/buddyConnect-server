@@ -47,4 +47,8 @@ export class ChatService {
       })),
     };
   }
+
+  async getAllChats(query: SearchChatsInputDto, userId: string) {
+    const { limit, offset } = query;
+  }
 }

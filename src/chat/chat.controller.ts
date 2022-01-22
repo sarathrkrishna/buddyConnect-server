@@ -35,6 +35,15 @@ export class ChatController {
     return this.chatService.searchChats(query, req);
   }
 
+  @Get('all')
+  @UseGuards(JwtAuthGuard)
+  async getAllChats(
+    @Query() query: SearchChatsInputDto,
+    @Request() req: GeneralRequestDto,
+  ) {
+    return this.chatService.getAllChats(query, req.user.id);
+  }
+
   @Post('create')
   @UseGuards(JwtAuthGuard)
   @ApiBody({ type: ChatCreateInputDto })
