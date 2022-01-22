@@ -30,7 +30,9 @@ export class SearchChatsOutputDto {
   @ApiProperty()
   creatorId: string;
   @ApiProperty()
-  groupDisplayPictureUrl: string;
+  displayPictureUrl: string;
+  @ApiProperty()
+  lastUpdated: string;
   @ApiProperty()
   @Type(() => Number)
   totalResultsCount: number;
