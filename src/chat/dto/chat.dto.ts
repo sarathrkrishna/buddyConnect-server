@@ -49,7 +49,7 @@ export class SearchChatsApiResultsDto {
   results: SearchChatsOutputDto[];
 }
 
-export class GetAllChatsInputDto extends PartialType(SearchPaginationDto) {}
+export class GetAllChatsInputDto extends SearchPaginationDto {}
 export class GetAllChatsQueryOutDto extends SearchChatsOutputDto {}
 
 export class GetAllChatsOutputDto {

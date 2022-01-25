@@ -63,7 +63,7 @@ export class ChatService {
     );
 
     return {
-      totalResults: results.length ? results[0].totalResultsCount : 0,
+      totalResults: results.length ? +results[0].totalResultsCount : 0,
       results: results.map((result) => ({
         ...result,
         totalResultsCount: undefined,
