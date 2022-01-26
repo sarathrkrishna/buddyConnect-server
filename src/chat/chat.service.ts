@@ -11,6 +11,7 @@ import {
   DeleteChatOutputDto,
   GetAllChatsInputDto,
   GetAllChatsQueryOutDto,
+  MemberChatExistsDto,
   SearchChatsInputDto,
   SearchChatsOutputDto,
   SelectMemberChatMasterDataDto,
@@ -20,6 +21,7 @@ import {
   getAllChatsQuery,
   hardDeleteChatForBoth,
   searchChatQuery,
+  selectExistingChat,
   selectMemberChatMasterData,
   softDeleteChatForUser,
 } from './queries/chat.queries';
@@ -31,16 +33,37 @@ export class ChatService {
   async createChat(body: ChatCreateInputDto, creatorId: string) {
     const { memberId } = body;
 
-    const data = await this.databaseService.rawQuery<ChatCreateOutputDto>(
-      createChatQuery,
-      [creatorId, memberId],
-    );
-
-    if (!data.length) {
-      throw new ConflictException('Unable to create chat');
+    if (memberId === creatorId) {
+      throw new ConflictException(
+        'Cannot create chat, select a member other than the creator',
+      );
     }
 
-    return data[0];
+    const existingUserArr =
+      await this.databaseService.rawQuery<MemberChatExistsDto>(
+        selectExistingChat,
+        [creatorId, memberId],
+      );
+
+    console.log(existingUserArr);
+
+    if (!existingUserArr.length) {
+      throw new NotFoundException('The member does not exist');
+    }
+
+    const [existingUserData] = existingUserArr;
+
+    if (!existingUserData.chatMasterId) {
+      // chat does not exist, create one
+      const [result] = await this.databaseService.rawQuery<ChatCreateOutputDto>(
+        createChatQuery,
+        [creatorId, memberId],
+      );
+
+      return result;
+    } else {
+      throw new ConflictException('Cannot create chat, as chat already exists');
+    }
   }
 
   async searchChats(query: SearchChatsInputDto, req: GeneralRequestDto) {

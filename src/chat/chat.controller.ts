@@ -9,13 +9,20 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
 import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 import { ChatService } from './chat.service';
 import {
   ChatCreateInputDto,
   ChatCreateOutputDto,
+  ChatDeleteOutputDto,
   GetAllChatsInputDto,
   GetAllChatsOutputDto,
   SearchChatsInputDto,
@@ -62,6 +69,8 @@ export class ChatController {
 
   @Delete('delete/:chat_id')
   @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'chat_id', type: String })
+  @ApiResponse({ type: ChatDeleteOutputDto })
   async softDeleteChat(
     @Param('chat_id') chatId: string,
     @Request() req: GeneralRequestDto,

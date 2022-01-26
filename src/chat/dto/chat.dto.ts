@@ -14,6 +14,16 @@ export class ChatCreateInputDto {
 export class ChatCreateOutputDto {
   @ApiProperty()
   chatId: string;
+  @ApiProperty()
+  clientId: string;
+  @ApiProperty()
+  username: string;
+  @ApiProperty()
+  fullName: string;
+  @ApiProperty()
+  description: string;
+  @ApiProperty()
+  displayPictureUrl: string;
 }
 
 export class SearchChatsInputDto extends SearchPaginationDto {}
@@ -67,4 +77,20 @@ export class SelectMemberChatMasterDataDto {
 
 export class DeleteChatOutputDto {
   chatId: string;
+}
+
+export class MemberChatExistsDto {
+  memberId: string;
+  chatMasterId: string;
+  chatId: string;
+  isDeleted: boolean;
+}
+
+export class ChatDeleteOutputDto {
+  @ApiProperty()
+  memberId: string;
+  @ApiProperty()
+  chatId: string;
+  @ApiProperty()
+  status: string;
 }

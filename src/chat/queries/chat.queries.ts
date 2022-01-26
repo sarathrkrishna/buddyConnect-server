@@ -1,34 +1,37 @@
+export const selectExistingChat = `
+	WITH
+ 	user_chats AS (
+ 		SELECT chat_id FROM chat_master cm INNER JOIN chat_data cd ON cm.chat_id=cd.id 
+ 		WHERE cm.client_id=$1
+ 	),
+	member_chats AS (
+		SELECT * FROM chat_master cmaster WHERE chat_id IN (SELECT chat_id FROM user_chats) AND client_id <> $1
+	)
+ 	SELECT client.id AS member_id, members.id AS chat_master_id, chat_id, is_deleted FROM client_master client
+ 	LEFT JOIN member_chats members ON client.id=members.client_id
+ 	WHERE client.id=$2
+	--  0 rows -> the member doesnt exist
+	-- row with no chat_master_id, chat_id and is_deleted -> the member is eligible for a fresh chat
+	-- row with all filled -> chat already exists
+`;
+
 export const createChatQuery = `
-    WITH
-	select_creator_chat AS (
-		SELECT DISTINCT cm.chat_id FROM chat_master cm 
-		INNER JOIN chat_data cd ON cm.chat_id = cd.id 
-		WHERE NOT cd.is_group AND cm.client_id= $1
-	),
-	chat_exists AS (
-		SELECT 1 AS exists FROM select_creator_chat sdc 
-		INNER JOIN chat_master cm ON sdc.chat_id=cm.chat_id 
-		WHERE cm.client_id = $2
-	),
+	WITH
 	create_chat AS (
-		INSERT INTO chat_data (
-			creator_id, last_updated
-		) SELECT $1 AS creator_id, NOW() AS last_updated WHERE NOT EXISTS (SELECT * FROM chat_exists) RETURNING creator_id AS client_id, id AS chat_id
+		INSERT INTO chat_data (creator_id, last_updated) VALUES ($1, NOW()) RETURNING creator_id AS client_id, id AS chat_id
 	),
-	chat_clients AS (
+	chat_master_data AS (
 		SELECT * FROM create_chat
 		UNION
-		SELECT id AS client_id, (SELECT chat_id FROM create_chat) FROM client_master 
-		WHERE id = $2
+		SELECT $2 AS client_id, (SELECT chat_id FROM create_chat)
 	),
-	insert_to_chat_master AS (
-		INSERT INTO chat_master (
-		client_id,
-		chat_id
-		)  
-		SELECT * FROM chat_clients WHERE NOT EXISTS (SELECT * FROM chat_exists) RETURNING chat_id
+	insert_chat_master AS (
+		INSERT INTO chat_master (client_id, chat_id)
+		SELECT * FROM chat_master_data RETURNING chat_id, client_id
 	)
-	SELECT DISTINCT chat_id FROM insert_to_chat_master
+SELECT chat_id, client_id, username, full_name, description, display_picture_url FROM insert_chat_master icm
+INNER JOIN client_master clm ON icm.client_id=clm.id
+WHERE icm.client_id <> $1
 `;
 
 export const searchChatQuery = `
