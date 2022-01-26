@@ -58,3 +58,13 @@ export class GetAllChatsOutputDto {
   @ApiProperty({ type: Array(GetAllChatsOutputDto) })
   results: GetAllChatsQueryOutDto[];
 }
+
+export class SelectMemberChatMasterDataDto {
+  clientId: string;
+  chatId: string;
+  isDeleted: boolean;
+}
+
+export class DeleteChatOutputDto {
+  chatId: string;
+}

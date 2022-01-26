@@ -1,18 +1,27 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 import {
   ChatCreateInputDto,
   ChatCreateOutputDto,
+  DeleteChatOutputDto,
   GetAllChatsInputDto,
   GetAllChatsQueryOutDto,
   SearchChatsInputDto,
   SearchChatsOutputDto,
+  SelectMemberChatMasterDataDto,
 } from './dto/chat.dto';
 import {
   createChatQuery,
   getAllChatsQuery,
+  hardDeleteChatForBoth,
   searchChatQuery,
+  selectMemberChatMasterData,
+  softDeleteChatForUser,
 } from './queries/chat.queries';
 
 @Injectable()
@@ -69,5 +78,42 @@ export class ChatService {
         totalResultsCount: undefined,
       })),
     };
+  }
+
+  async softDeleteChat(chatId: string, userId: string) {
+    const data =
+      await this.databaseService.rawQuery<SelectMemberChatMasterDataDto>(
+        selectMemberChatMasterData,
+        [userId, chatId],
+      );
+
+    if (!data.length) {
+      throw new NotFoundException('The chat is invalid for this user');
+    }
+    const [{ clientId: memberId, isDeleted }] = data;
+
+    if (!isDeleted) {
+      const [data] = await this.databaseService.rawQuery<DeleteChatOutputDto>(
+        softDeleteChatForUser,
+        [userId, chatId],
+      );
+
+      return {
+        memberId,
+        chatId: data.chatId,
+        status: 'soft_delete',
+      };
+    } else {
+      const [data] = await this.databaseService.rawQuery<DeleteChatOutputDto>(
+        hardDeleteChatForBoth,
+        [chatId],
+      );
+
+      return {
+        memberId,
+        chatId: data.chatId,
+        status: 'hard_delete',
+      };
+    }
   }
 }

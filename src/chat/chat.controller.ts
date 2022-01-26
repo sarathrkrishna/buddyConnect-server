@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -57,5 +58,14 @@ export class ChatController {
     @Body() body: ChatCreateInputDto,
   ) {
     return this.chatService.createChat(body, req.user.id);
+  }
+
+  @Delete('delete/:chat_id')
+  @UseGuards(JwtAuthGuard)
+  async softDeleteChat(
+    @Param('chat_id') chatId: string,
+    @Request() req: GeneralRequestDto,
+  ) {
+    return this.chatService.softDeleteChat(chatId, req.user.id);
   }
 }
