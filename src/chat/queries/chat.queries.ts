@@ -65,3 +65,22 @@ export const getAllChatsQuery = `
 	)
 	SELECT *, (SELECT * FROM total_count) FROM user_chat_data_by_chat_id ORDER BY last_updated DESC LIMIT $2 OFFSET $3
 `;
+
+export const selectMemberChatMasterData = `
+	WITH 
+	user_chats AS (
+		SELECT chat_id FROM chat_master cm INNER JOIN chat_data cd ON cm.chat_id=cd.id WHERE client_id=$1
+	)
+	SELECT client_id, cm.chat_id, is_deleted FROM chat_master cm 
+	INNER JOIN user_chats uc ON cm.chat_id=uc.chat_id 
+	INNER JOIN chat_data cd ON cm.chat_id=cd.id
+	WHERE cm.chat_id=$2 AND cm.client_id <> $1 AND NOT cd.is_group
+`;
+
+export const softDeleteChatForUser = `
+	UPDATE chat_master SET is_deleted=true WHERE client_id=$1 AND chat_id=$2 RETURNING chat_id;
+`;
+
+export const hardDeleteChatForBoth = `
+	DELETE FROM chat_data WHERE id=$1 RETURNING id AS chat_id;
+`;
