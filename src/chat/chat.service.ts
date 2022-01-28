@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
+import { isUUID } from 'src/shared/utils/utils';
 import {
   ChatCreateInputDto,
   ChatCreateOutputDto,
@@ -103,7 +105,11 @@ export class ChatService {
     };
   }
 
-  async softDeleteChat(chatId: string, userId: string) {
+  async softHardDeleteChat(chatId: string, userId: string) {
+    if (!isUUID(chatId)) {
+      throw new BadRequestException('chat_id is not a UUID.');
+    }
+
     const data =
       await this.databaseService.rawQuery<SelectMemberChatMasterDataDto>(
         selectMemberChatMasterData,

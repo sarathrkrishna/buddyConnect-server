@@ -71,10 +71,10 @@ export class ChatController {
   @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'chat_id', type: String })
   @ApiResponse({ type: ChatDeleteOutputDto })
-  async softDeleteChat(
+  async softHardDeleteChat(
     @Param('chat_id') chatId: string,
     @Request() req: GeneralRequestDto,
   ) {
-    return this.chatService.softDeleteChat(chatId, req.user.id);
+    return this.chatService.softHardDeleteChat(chatId, req.user.id);
   }
 }
