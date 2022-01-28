@@ -35,6 +35,6 @@ export class MessageService {
       throw new NotFoundException('The chat is not found for the user');
     }
 
-    return messageRows;
+    return messageRows[0];
   }
 }
