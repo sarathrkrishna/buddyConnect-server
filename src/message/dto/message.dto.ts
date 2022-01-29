@@ -38,7 +38,7 @@ export class GetAllMessagesFromChatQueryDto extends GetAllMessageFromChatResult 
 
 export class GetAllMessagesFromChatOutputDto {
   @ApiProperty()
-  totalCount: number;
+  totalResults: number;
   @ApiProperty({ type: Array(GetAllMessageFromChatResult) })
   results: GetAllMessageFromChatResult[];
 }
@@ -53,7 +53,7 @@ export class SearchMessagesFromChatOutputDto {
   @ApiProperty()
   searchString: string;
   @ApiProperty()
-  totalCount: number;
+  totalResults: number;
   @ApiProperty({ type: Array(GetAllMessageFromChatResult) })
   results: GetAllMessageFromChatResult[];
 }
