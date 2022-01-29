@@ -9,7 +9,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { DatabaseService } from 'src/database/database.service';
 import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
 import { GeneralRequestDto } from 'src/shared/dtos/auth/autherization.user.dto';
 import {
