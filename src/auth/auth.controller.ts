@@ -17,11 +17,4 @@ export class AuthController {
   async userLogin(@Request() req: LoginInputDto): Promise<LoginOutput> {
     return this.authService.userLogin(req.user);
   }
-
-  // TO BE REMOVED
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  async userProfileTest(@Request() req) {
-    return req.user;
-  }
 }

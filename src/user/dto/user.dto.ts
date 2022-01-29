@@ -38,7 +38,7 @@ export class InsertClientInputDto {
 
 export class MasterClientDataDto {
   @ApiProperty()
-  id: number;
+  id: string;
   @ApiProperty()
   username: string;
   @ApiProperty()
