@@ -65,7 +65,7 @@ export class MessageService {
       );
 
     return {
-      totalCount: messageRows.length ? +messageRows[0].totalCount : 0,
+      totalResults: messageRows.length ? +messageRows[0].totalCount : 0,
       results: messageRows.map((row) => ({
         ...row,
         totalCount: undefined,
@@ -94,7 +94,7 @@ export class MessageService {
 
     const response: SearchMessagesFromChatOutputDto = {
       searchString: searchString,
-      totalCount: messageRows.length ? +messageRows[0].totalCount : 0,
+      totalResults: messageRows.length ? +messageRows[0].totalCount : 0,
       results: messageRows.map((row) => ({
         ...row,
         totalCount: undefined,
